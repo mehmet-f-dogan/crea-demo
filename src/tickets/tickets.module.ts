@@ -6,6 +6,7 @@ import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [SessionsModule, UsersModule],
+  exports: [TicketsService],
   controllers: [TicketsController],
   providers: [TicketsService],
 })

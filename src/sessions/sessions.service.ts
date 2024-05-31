@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
+import { Session } from './entities/session.entity';
 
 @Injectable()
 export class SessionsService {
   create(createSessionDto: CreateSessionDto) {
-    return 'This action adds a new session';
+    return new Session();
   }
 
   findAll() {
