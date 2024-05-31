@@ -6,9 +6,10 @@ import { MoviesModule } from './movies/movies.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { DatabaseModule } from './database/database.module';
-
+import { ConfigModule } from './config/config.module';
 @Module({
   imports: [
+    ConfigModule,
     UsersModule,
     MoviesModule,
     SessionsModule,

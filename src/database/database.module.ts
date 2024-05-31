@@ -11,16 +11,24 @@ import { Session } from 'src/sessions/entities/session.entity';
     ConfigModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DATABASE_HOST'),
-        port: configService.get<number>('DATABASE_PORT'),
-        username: configService.get<string>('DATABASE_USERNAME'),
-        password: configService.get<string>('DATABASE_PASSWORD'),
-        database: configService.get<string>('DATABASE_NAME'),
-        entities: [User, Ticket, Movie, Session],
-        synchronize: true, // Set to false in production
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const host = configService.get<string>('DATABASE_HOST');
+        const port = configService.get<number>('DATABASE_PORT');
+        const username = configService.get<string>('DATABASE_USERNAME');
+        const password = configService.get<string>('DATABASE_PASSWORD');
+        const database = configService.get<string>('DATABASE_NAME');
+
+        return {
+          type: 'postgres',
+          host,
+          port,
+          username,
+          password,
+          database,
+          entities: [User, Ticket, Session, Movie],
+          synchronize: true,
+        };
+      },
       inject: [ConfigService],
     }),
   ],
