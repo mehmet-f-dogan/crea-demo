@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { User } from 'src/users/entities/user.entity';
-import { Ticket } from 'src/tickets/entities/ticket.entity';
-import { Movie } from 'src/movies/entities/movie.entity';
-import { Session } from 'src/sessions/entities/session.entity';
+import { User } from '../users/entities/user.entity';
+import { Ticket } from '../tickets/entities/ticket.entity';
+import { Movie } from '../movies/entities/movie.entity';
+import { Session } from '../sessions/entities/session.entity';
 
 @Module({
   imports: [
@@ -12,6 +12,7 @@ import { Session } from 'src/sessions/entities/session.entity';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
+        console.log(process.env.NODE_ENV);
         const host = configService.get<string>('DATABASE_HOST');
         const port = configService.get<number>('DATABASE_PORT');
         const username = configService.get<string>('DATABASE_USERNAME');

@@ -2,29 +2,28 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
+  Request,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
+@ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
-  @Post('toggle-mod')
-  toggleMod() {
-    return this.usersService.toggleMod(0);
+  @HttpCode(HttpStatus.OK)
+  @Post('activate-mod')
+  @ApiBearerAuth('access-token')
+  toggleMod(@Request() req) {
+    return this.usersService.activateMod(req.user.id);
   }
 
   @Get('history')
-  getHistory() {}
+  @ApiBearerAuth('access-token')
+  getHistory(@Request() req) {
+    return this.usersService.getHistory(req.user.id);
+  }
 }

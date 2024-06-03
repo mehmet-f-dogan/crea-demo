@@ -1,5 +1,4 @@
-// movie.entity.ts
-import { Session } from 'src/sessions/entities/session.entity';
+import { Session } from '../../sessions/entities/session.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 @Entity()
@@ -15,7 +14,6 @@ export class Movie {
 
   @OneToMany(() => Session, (session) => session.movie, {
     cascade: true,
-    onDelete: 'CASCADE',
   })
   sessions: Session[];
 }

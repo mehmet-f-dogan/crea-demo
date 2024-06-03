@@ -1,4 +1,5 @@
-import { Ticket } from 'src/tickets/entities/ticket.entity';
+import { Role } from '../../roles/role.enum';
+import { Ticket } from '../../tickets/entities/ticket.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 @Entity()
@@ -6,7 +7,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   username: string;
 
   @Column()
@@ -15,12 +16,9 @@ export class User {
   @Column()
   age: number;
 
-  @Column({ default: false })
-  isManager: boolean;
+  @Column('enum', { enum: Role, array: true, default: [Role.Customer] })
+  roles: Role[];
 
-  @OneToMany(() => Ticket, (ticket) => ticket.user, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => Ticket, (ticket) => ticket.user)
   tickets: Ticket[];
 }

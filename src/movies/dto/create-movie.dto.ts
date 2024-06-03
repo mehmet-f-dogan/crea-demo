@@ -1,6 +1,12 @@
-import { IsArray, IsString, Min, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsString,
+  Min,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateSessionDto } from 'src/sessions/dto/create-session.dto';
+import { CreateSessionDto } from '../../sessions/dto/create-session.dto';
 
 export class CreateMovieDto {
   @IsString()
@@ -10,5 +16,6 @@ export class CreateMovieDto {
   minimumAge: number;
   @IsArray()
   @Type(() => CreateSessionDto)
+  @ValidateNested({ each: true })
   sessions: CreateSessionDto[];
 }

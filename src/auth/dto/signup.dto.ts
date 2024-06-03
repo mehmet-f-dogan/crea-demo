@@ -1,6 +1,6 @@
 import { IsInt, IsPositive, IsString, MinLength } from 'class-validator';
 
-export class CreateUserDto {
+export class SignupDto {
   @IsString()
   @MinLength(1)
   username: string;
@@ -9,7 +9,7 @@ export class CreateUserDto {
   @MinLength(1)
   password: string;
 
-  @IsInt()
   @IsPositive()
+  @IsInt()
   age: number;
 }

@@ -1,28 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Role } from '../roles/role.enum';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
+
+  async create(createUserDto: CreateUserDto) {
+    const user = this.usersRepository.create(createUserDto);
+    return await this.usersRepository.save(user);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findOne(id: number, relations: string[]) {
+    const user = this.usersRepository.findOne({
+      where: { id },
+      relations,
+    });
+    if (!user) {
+      throw new NotFoundException(`User not found with id: ${id}`);
+    }
+    return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOneByUsername(username: string) {
+    const user = await this.usersRepository.findOne({
+      where: { username },
+    });
+    if (!user) {
+      throw new NotFoundException(`User not found with username: ${username}`);
+    }
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async activateMod(id: number) {
+    const user = await this.findOne(id, []);
+
+    if (!user.roles.includes(Role.Moderator)) {
+      user.roles.push(Role.Moderator);
+    }
+    await this.usersRepository.save(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  async getHistory(id: number): Promise<string[]> {
+    const user = await this.findOne(id, ['tickets.session.movie']);
+    if (user.tickets) {
+      const movieNames = user.tickets
+        .filter((ticket) => ticket.isRedeemed)
+        .map((ticket) => ticket.session.movie.name);
 
-  toggleMod(id: number) {}
+      const result = [];
+      for (const name of movieNames) {
+        if (!result.includes(name)) {
+          result.push(name);
+        }
+      }
+      return result;
+    }
+    return [];
+  }
 }

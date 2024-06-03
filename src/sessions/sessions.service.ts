@@ -1,27 +1,69 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  forwardRef,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateSessionDto } from './dto/create-session.dto';
-import { UpdateSessionDto } from './dto/update-session.dto';
 import { Session } from './entities/session.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { MoviesService } from '../movies/movies.service';
 
 @Injectable()
 export class SessionsService {
-  create(createSessionDto: CreateSessionDto) {
-    return new Session();
+  constructor(
+    @InjectRepository(Session)
+    private readonly sessionsRepository: Repository<Session>,
+    @Inject(forwardRef(() => MoviesService))
+    private readonly moviesService: MoviesService,
+  ) {}
+
+  async create(createSessionDto: CreateSessionDto) {
+    const movie = await this.moviesService.findOne(
+      createSessionDto.movieId,
+      [],
+    );
+
+    const existingSession = await this.sessionsRepository.findOneBy({
+      date: createSessionDto.date,
+      roomNumber: createSessionDto.roomNumber,
+      timeSlot: createSessionDto.timeSlot,
+    });
+
+    if (existingSession) {
+      throw new BadRequestException(
+        'Another session is registered for the same timeslot and room',
+      );
+    }
+
+    const session = this.sessionsRepository.create({
+      date: createSessionDto.date,
+      movie: movie,
+      roomNumber: createSessionDto.roomNumber,
+      timeSlot: createSessionDto.timeSlot,
+      tickets: [],
+    });
+
+    return await this.sessionsRepository.save(session);
   }
 
-  findAll() {
-    return `This action returns all sessions`;
+  async findOne(id: number, relations: string[]) {
+    const sessions = await this.sessionsRepository.findOne({
+      where: { id },
+      relations,
+    });
+    if (!sessions) {
+      throw new NotFoundException(`Session not found with id: ${id}`);
+    }
+    return sessions;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} session`;
-  }
-
-  update(id: number, updateSessionDto: UpdateSessionDto) {
-    return `This action updates a #${id} session`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} session`;
+  async remove(id: number) {
+    try {
+      const session = await this.findOne(id, []);
+      return await this.sessionsRepository.remove(session);
+    } catch (ignored) {}
   }
 }
