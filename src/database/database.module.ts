@@ -22,7 +22,6 @@ import { Session } from '../sessions/entities/session.entity';
               autoLoadEntities: true,
             })
           : async (configService: ConfigService) => {
-              console.log(process.env.NODE_ENV);
               const host = configService.get<string>('DATABASE_HOST');
               const port = configService.get<number>('DATABASE_PORT');
               const username = configService.get<string>('DATABASE_USERNAME');
@@ -37,6 +36,7 @@ import { Session } from '../sessions/entities/session.entity';
                 password,
                 database,
                 entities: [User, Ticket, Session, Movie],
+                ssl: false,
                 synchronize: true,
               };
             },
