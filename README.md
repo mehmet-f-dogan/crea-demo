@@ -4,7 +4,11 @@
 
 This project is a Movie Management System developed using Node.js and the NestJS framework. It provides a RESTful API for managing movies, including user registration, movie management by managers, and ticket purchases by customers. There is no user interface; only the API is implemented.
 
-## Description
+Live API link:
+
+https://crea-demo.vercel.app/
+
+Note: Each commit to the master branch gets automatically pulled, builded and deployed by Vercel.
 
 ## Requirements
 
