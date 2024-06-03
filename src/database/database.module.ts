@@ -36,7 +36,7 @@ import { Session } from '../sessions/entities/session.entity';
                 password,
                 database,
                 entities: [User, Ticket, Session, Movie],
-                ssl: false,
+                ssl: true,
                 synchronize: true,
               };
             },
