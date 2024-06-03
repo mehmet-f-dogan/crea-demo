@@ -6,9 +6,9 @@ import { Public } from './auth/auth.guard';
 export class AppController {
   constructor(private readonly appService: AppService) {}
   @HttpCode(HttpStatus.OK)
-  @Get('activate-mod')
+  @Get()
   @Public()
-  toggleMod() {
-    return 'Welcome to my Crea Demo API!';
+  greet() {
+    return `<h1>Crea Demo API<h1>`;
   }
 }
