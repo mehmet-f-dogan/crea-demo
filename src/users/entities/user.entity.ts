@@ -2,6 +2,7 @@ import { Role } from '../../roles/role.enum';
 import { Ticket } from '../../tickets/entities/ticket.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
+const defaultRole = ['customer'];
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -16,8 +17,8 @@ export class User {
   @Column()
   age: number;
 
-  @Column('enum', { enum: Role, array: true, default: [Role.Customer] })
-  roles: Role[];
+  @Column('simple-array')
+  roles: string[] = defaultRole;
 
   @OneToMany(() => Ticket, (ticket) => ticket.user)
   tickets: Ticket[];

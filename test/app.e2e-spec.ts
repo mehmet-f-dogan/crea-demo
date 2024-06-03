@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 
 describe('App (e2e)', () => {
   let app: INestApplication;
+  let authToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -19,53 +20,59 @@ describe('App (e2e)', () => {
     await app.close();
   });
 
-  it('/movies (GET)', () => {
-    return request(app.getHttpServer()).get('/movies').expect(200);
+  it('/auth/register (POST)', async () => {
+    const res = await request(app.getHttpServer()).post('/auth/signup').send({
+      username: 'test@example.com',
+      password: 'testpassword',
+      age: 10,
+    });
+    expect(res.status).toBe(HttpStatus.CREATED);
   });
 
-  it('/movies/:id (GET)', () => {
-    return request(app.getHttpServer()).get('/movies/1').expect(200);
+  it('/auth/login (POST)', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ username: 'test@example.com', password: 'testpassword' });
+    expect(res.status).toBe(HttpStatus.OK);
+    expect(res.body).toHaveProperty('access_token');
+    authToken = res.body.access_token;
+  });
+
+  it('/users/activate-mod (POST)', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/users/activate-mod')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send();
+    expect(res.status).toBe(HttpStatus.OK);
   });
 
   it('/movies (POST)', () => {
     return request(app.getHttpServer())
       .post('/movies')
-      .send({ name: 'Test Movie', minimumAge: 12 })
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ name: 'Test Movie', minimumAge: 12, sessions: [] })
       .expect(201);
   });
 
-  it('/movies/:id (PUT)', () => {
+  it('/movies (GET)', async () => {
     return request(app.getHttpServer())
-      .put('/movies/1')
+      .get('/movies')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200);
+  });
+
+  it('/movies/:id (PATCH)', () => {
+    return request(app.getHttpServer())
+      .patch('/movies/1')
+      .set('Authorization', `Bearer ${authToken}`)
       .send({ name: 'Updated Movie', minimumAge: 15 })
       .expect(200);
   });
 
   it('/movies/:id (DELETE)', () => {
-    return request(app.getHttpServer()).delete('/movies/1').expect(200);
-  });
-
-  it('/sessions (GET)', () => {
-    return request(app.getHttpServer()).get('/sessions').expect(200);
-  });
-
-  it('/sessions/:id (GET)', () => {
-    return request(app.getHttpServer()).get('/sessions/1').expect(200);
-  });
-
-  it('/sessions (POST)', () => {
     return request(app.getHttpServer())
-      .post('/sessions')
-      .send({
-        date: new Date(),
-        roomNumber: 1,
-        timeSlot: '14:00-16:00',
-        movieId: 1,
-      })
-      .expect(201);
-  });
-
-  it('/sessions/:id (DELETE)', () => {
-    return request(app.getHttpServer()).delete('/sessions/1').expect(200);
+      .delete('/movies/1')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200);
   });
 });

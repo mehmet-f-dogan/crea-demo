@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateStringFormat } from '../../shared/isDateStringFormat.decorator';
-import { TimeSlot } from '../entities/session.entity';
-import { IsNotEmpty, IsPositive, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsPositive, IsString } from 'class-validator';
 
 export class CreateSessionDto {
   @IsString()
@@ -14,8 +13,15 @@ export class CreateSessionDto {
   })
   date: string;
 
+  @IsString()
   @IsNotEmpty()
-  timeSlot: TimeSlot;
+  @IsIn(['10', '12', '14', '16', '18', '20', '22'])
+  @ApiProperty({
+    enum: ['10', '12', '14', '16', '18', '20', '22'],
+    example: '10',
+    description: 'Available time slots: 10, 12, 14, 16, 18, 20, 22',
+  })
+  timeSlot: string;
 
   @IsPositive()
   roomNumber: number;

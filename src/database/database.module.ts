@@ -11,25 +11,35 @@ import { Session } from '../sessions/entities/session.entity';
     ConfigModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
-        console.log(process.env.NODE_ENV);
-        const host = configService.get<string>('DATABASE_HOST');
-        const port = configService.get<number>('DATABASE_PORT');
-        const username = configService.get<string>('DATABASE_USERNAME');
-        const password = configService.get<string>('DATABASE_PASSWORD');
-        const database = configService.get<string>('DATABASE_NAME');
+      useFactory:
+        process.env.NODE_ENV === 'test'
+          ? () => ({
+              type: 'sqlite',
+              database: ':memory:',
+              dropSchema: true,
+              entities: [],
+              synchronize: true,
+              autoLoadEntities: true,
+            })
+          : async (configService: ConfigService) => {
+              console.log(process.env.NODE_ENV);
+              const host = configService.get<string>('DATABASE_HOST');
+              const port = configService.get<number>('DATABASE_PORT');
+              const username = configService.get<string>('DATABASE_USERNAME');
+              const password = configService.get<string>('DATABASE_PASSWORD');
+              const database = configService.get<string>('DATABASE_NAME');
 
-        return {
-          type: 'postgres',
-          host,
-          port,
-          username,
-          password,
-          database,
-          entities: [User, Ticket, Session, Movie],
-          synchronize: true,
-        };
-      },
+              return {
+                type: 'postgres',
+                host,
+                port,
+                username,
+                password,
+                database,
+                entities: [User, Ticket, Session, Movie],
+                synchronize: true,
+              };
+            },
       inject: [ConfigService],
     }),
   ],

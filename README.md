@@ -53,7 +53,7 @@ The following endpoints are available in the API:
 
 - Auth Endpoints
 
-  - POST /auth/register - Register a new user.
+  - POST /auth/signup - Register a new user.
   - POST /auth/login - Log in a user, returns a token.
 
 - User Endpoints
@@ -80,4 +80,4 @@ In this project, I followed the principles of Domain-Driven Design to structure 
 
 When it comes to tests, I have created unit tests for session and movie services. The reason for it is that, rest of the services mostly do basic CRUD and operations.
 
-E2E test checks if the endpoints exist and do not do data validation.
+E2E tests test most important movies endpoints and auth endpoints.
